@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas</title>
+    <link rel="stylesheet" href="./styles/index.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Lista de Tarefas</h1>
+        <button id="addTaskButton">Adicionar Tarefa</button>
+    </div>
+
+    <table id="taskTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome da Tarefa</th>
+                <th>Custo (R$)</th>
+                <th>Data Limite</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="taskList"></tbody>
+    </table>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2 id="modalTitle">Adicionar Nova Tarefa</h2>
+            <div id="errorMessage" style="color: red; display: none;"></div>
+            <form id="taskForm">
+                <label>Nome da Tarefa: <input type="text" id="taskName" required></label><br>
+                <label>Custo (R$): <input type="number" id="taskCost" required></label><br>
+                <label>Data Limite: <input type="date" id="taskDeadline" required></label><br>
+                <button id="saveTaskButton" type="submit">Salvar Tarefa</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span id="closeDeleteModal" class="close">&times;</span>
+            <h2>Confirmar Exclusão</h2>
+            <p>Tem certeza de que deseja excluir esta tarefa?</p>
+            <button id="confirmDeleteButton">Excluir</button>
+            <button id="cancelDeleteButton">Cancelar</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

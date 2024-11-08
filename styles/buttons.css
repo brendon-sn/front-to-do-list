@@ -1,0 +1,101 @@
+.editButton,
+.deleteButton {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editButton {
+    background: var(--primary-500);
+    color: white;
+}
+
+.editButton:hover {
+    background: var(--primary-600);
+    transform: translateY(-1px);
+}
+
+.deleteButton {
+    background: var(--danger-500);
+    color: white;
+}
+
+.deleteButton:hover {
+    background: var(--danger-600);
+    transform: translateY(-1px);
+}
+
+#addTaskButton,
+#saveTaskButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--success-500);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#saveTaskButton {
+    width: 100%;
+}
+
+#addTaskButton:hover,
+#saveTaskButton:hover {
+    background: var(--success-600);
+    transform: translateY(-2px);
+}
+
+#deleteModal {
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 0.4);
+    backdrop-filter: blur(4px);
+    display: none;
+    place-items: center;
+    padding: 1rem;
+    z-index: 50;
+    text-align: center;
+}
+
+#confirmDeleteButton,
+#cancelDeleteButton {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 0.5rem;
+}
+
+#confirmDeleteButton {
+    background: var(--danger-500);
+    color: white;
+    margin-right: 10rem;
+}
+
+#confirmDeleteButton:hover {
+    background: var(--danger-600);
+    transform: translateY(-1px);
+}
+
+#cancelDeleteButton {
+    background: var(--primary-500);
+    color: var(--primary-50);
+}
+
+#cancelDeleteButton:hover {
+    background: var(--primary-700);
+    transform: translateY(-1px);
+}
