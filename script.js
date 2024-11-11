@@ -191,7 +191,7 @@ taskForm.addEventListener('submit', async (e) => {
     const taskCost = parseFloat(document.getElementById('taskCost').value)
     const taskDeadline = document.getElementById('taskDeadline').value
 
-    const taskExists = tasks.some((task, index) => task.name === taskName && index !== taskToEditIndex)
+    const taskExists = tasks.some((task, index) => task.name.toLowerCase() === taskName.toLowerCase() && index !== taskToEditIndex)
 
     if (taskExists) {
         errorMessageDiv.textContent = 'Já existe uma tarefa com esse nome. Por favor, escolha outro!'
