@@ -23,7 +23,7 @@
     top: 1rem;
     right: 1rem;
     font-size: 1.5rem;
-    color: var(--gray-400);
+    color: var(--danger-500);
     cursor: pointer;
     transition: color 0.2s ease;
     width: 2rem;
@@ -34,8 +34,8 @@
 }
 
 .close:hover {
-    color: var(--gray-700);
-    background: var(--gray-100);
+    color: var(--danger-600);
+    transform: scale(1.5); 
 }
 
 h2 {

@@ -1,6 +1,7 @@
 .editButton,
 .deleteButton {
     padding: 0.625rem 1.25rem;
+    margin: 4px;
     border: none;
     border-radius: 0.75rem;
     font-weight: 600;
@@ -98,4 +99,96 @@
 #cancelDeleteButton:hover {
     background: var(--primary-700);
     transform: translateY(-1px);
+}
+
+.arrow {
+    font-size: 1rem; 
+  }
+  
+.up::before {
+    content: '\2191'; 
+}
+  
+.down::before {
+    content: '\2193'; 
+}
+
+.upButton,
+.downButton {
+   border: 2px solid rgba(252, 173, 3, 0.3);
+   border-radius: 8px;
+   padding: 0.6rem 1rem;
+   margin: 4px;
+   font-size: 0.875rem;
+   color: #fcad03;
+   background: rgba(252, 173, 3, 0.1);
+   cursor: pointer;
+   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   backdrop-filter: blur(4px);
+   box-shadow: 0 0 15px rgba(252, 173, 3, 0.2);
+   position: relative;
+   overflow: hidden;
+}
+
+.upButton:hover,
+.downButton:hover {
+   background: #fcad03;
+   color: #fff;
+   transform: translateY(-2px);
+   box-shadow: 0 0 25px rgba(252, 173, 3, 0.4);
+}
+
+.upButton:active,
+.downButton:active {
+   transform: translateY(1px);
+   box-shadow: 0 0 10px rgba(252, 173, 3, 0.3);
+}
+
+.upButton:disabled,
+.downButton:disabled {
+   background: rgba(238, 238, 238, 0.1);
+   border-color: rgba(153, 153, 153, 0.2);
+   color: #999;
+   cursor: not-allowed;
+   box-shadow: none;
+   transform: none;
+}
+
+.upButton::after,
+.downButton::after {
+   margin-left: 0.25rem;
+}
+
+.upButton::before,
+.downButton::before {
+   content: '';
+   position: absolute;
+   top: -50%;
+   left: -50%;
+   width: 200%;
+   height: 200%;
+   background: linear-gradient(
+       45deg,
+       transparent,
+       rgba(252, 173, 3, 0.1),
+       transparent
+   );
+   transform: rotate(45deg);
+   transition: 0.5s;
+   opacity: 0;
+}
+
+.upButton:hover::before,
+.downButton:hover::before {
+   opacity: 1;
+   animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+   0% {
+       transform: rotate(45deg) translateX(-100%);
+   }
+   100% {
+       transform: rotate(45deg) translateX(100%);
+   }
 }
