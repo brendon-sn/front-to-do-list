@@ -97,8 +97,12 @@ function updateTaskList(itens) {
             <td>${formattedCost}</td>
             <td>${formattedDate}</td>
             <td class="actions">
-                <button onclick="editTask(${index})" class="editButton">✏️</button>
-                <button onclick="openDeleteModal(${index})" class="deleteButton">🗑️</button>
+                <button onclick="editTask(${index})" class="editButton">
+                    <img src="assets/edit.svg" alt="">
+                </button>
+                <button onclick="openDeleteModal(${index})" class="deleteButton">
+                    <img src="assets/delete.svg" alt="">
+                </button>
             </td>
             <td>
                 <button onclick="moveTaskUp(${index})" class="upButton" ${index === 0 ? 'disabled' : ''}>

@@ -1,6 +1,6 @@
 .editButton,
 .deleteButton {
-    padding: 0.625rem 1.25rem;
+    padding: 0.5rem 0.9rem;
     margin: 4px;
     border: none;
     border-radius: 0.75rem;
@@ -12,7 +12,6 @@
 
 .editButton {
     background: var(--primary-500);
-    color: white;
 }
 
 .editButton:hover {
@@ -22,7 +21,6 @@
 
 .deleteButton {
     background: var(--danger-500);
-    color: white;
 }
 
 .deleteButton:hover {

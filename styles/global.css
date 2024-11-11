@@ -56,6 +56,11 @@ body {
     color: var(--gray-800);
 }
 
+.header img {
+    margin-right: 0.5rem;
+    width: 24px;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
