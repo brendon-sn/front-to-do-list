@@ -45,25 +45,3 @@ tr:hover td {
     margin: 0 auto;
     padding: 2rem;
 }
-
-ul {
-    display: grid;
-    gap: 1rem;
-    padding: 0;
-    margin: 1.5rem 0;
-    list-style: none;
-}
-
-li {
-    background: white;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
-    border: 1px solid var(--gray-200);
-}
-
-li:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
