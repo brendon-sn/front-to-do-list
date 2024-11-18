@@ -31,6 +31,7 @@ async function loadTasks() {
 addTaskButton.addEventListener('click', () => {
     taskModal.style.display = 'block'
     taskForm.reset()
+    charLimitWarning.style.display = 'none'
     taskToEditIndex = null
     errorMessageDiv.style.display = 'none'
     modalTitle.textContent = 'Adicionar Nova Tarefa'
@@ -203,27 +204,48 @@ async function updateTask(task) {
     }
 }
 
+const taskNameInput = document.getElementById('taskName')
+const charLimitWarning = document.getElementById('charLimitWarning')
+
+taskNameInput.addEventListener('input', () => {
+    if (taskNameInput.value.length === 140) {
+        charLimitWarning.style.display = 'inline'
+    } else {
+        charLimitWarning.style.display = 'none'
+    }
+})
+
 taskForm.addEventListener('submit', async (e) => {
     e.preventDefault()
 
-    const taskName = document.getElementById('taskName').value
+    const taskName = taskNameInput.value
     const taskCost = parseFloat(document.getElementById('taskCost').value)
     const taskDeadline = document.getElementById('taskDeadline').value
 
-    const taskExists = tasks.some((task, index) => task.name.toLowerCase() === taskName.toLowerCase() && index !== taskToEditIndex)
+    const taskExists = tasks.some(
+        (task, index) =>
+            task.name.toLowerCase() === taskName.toLowerCase() &&
+            index !== taskToEditIndex
+    )
+
+    if (taskName.length > 140) {
+        charLimitWarning.style.display = 'inline'
+        return
+    }
 
     if (taskExists) {
-        errorMessageDiv.textContent = 'Já existe uma tarefa com esse nome. Por favor, escolha outro!'
+        errorMessageDiv.textContent =
+            'Já existe uma tarefa com esse nome. Por favor, escolha outro!'
         errorMessageDiv.style.display = 'block'
         return
-    } 
+    }
 
     errorMessageDiv.style.display = 'none'
 
     const taskData = {
         name: taskName,
         cost: taskCost,
-        deadline: taskDeadline
+        deadline: taskDeadline,
     }
 
     try {
@@ -231,7 +253,7 @@ taskForm.addEventListener('submit', async (e) => {
         if (taskToEditIndex !== null) {
             const updatedTask = {
                 id: tasks[taskToEditIndex].id,
-                ...taskData
+                ...taskData,
             }
             responseData = await updateTask(updatedTask)
             tasks[taskToEditIndex] = updatedTask
@@ -248,7 +270,8 @@ taskForm.addEventListener('submit', async (e) => {
         window.location.reload()
     } catch (error) {
         console.error('Erro ao enviar a tarefa:', error)
-        errorMessageDiv.textContent = 'Erro ao enviar a tarefa. Por favor, tente novamente.'
+        errorMessageDiv.textContent =
+            'Erro ao enviar a tarefa. Por favor, tente novamente.'
         errorMessageDiv.style.display = 'block'
     }
 })
@@ -266,6 +289,7 @@ function editTask(index) {
 
     taskToEditIndex = index
     taskModal.style.display = 'block'
+    charLimitWarning.style.display = 'none'
     errorMessageDiv.style.display = 'none'
     modalTitle.textContent = 'Editar Tarefa'
     document.getElementById('taskName').focus()
