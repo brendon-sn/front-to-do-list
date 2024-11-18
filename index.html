@@ -35,8 +35,23 @@
             <h2 id="modalTitle">Adicionar Nova Tarefa</h2>
             <div id="errorMessage" style="color: red; display: none;"></div>
             <form id="taskForm">
-                <label>Nome da Tarefa: <input type="text" id="taskName" required></label><br>
-                <label>Custo (R$): <input type="number" id="taskCost" required></label><br>
+                <label>Nome da Tarefa:
+                    <input type="text" id="taskName" placeholder="O nome da tarefa deve conter no máximo 140 caracteres" maxlength="140" required>
+                    <span id="charLimitWarning" style="color: red; display: none;">Máximo de 140 caracteres atingido!</span>
+                    <script>
+                        const taskNameInput = document.getElementById('taskName')
+                        const charLimitWarning = document.getElementById('charLimitWarning')
+                    
+                        taskNameInput.addEventListener('input', () => {
+                            if (taskNameInput.value.length === 140) {
+                                charLimitWarning.style.display = 'inline'
+                            } else {
+                                charLimitWarning.style.display = 'none'
+                            }
+                        })
+                    </script>
+                </label><br>
+                <label>Custo (R$): <input type="number" id="taskCost" min="1" max="99999999" placeholder="Informe um valor entre 1 e 99.999.999" required></label><br>
                 <label>Data Limite: <input type="date" id="taskDeadline" required></label><br>
                 <button id="saveTaskButton" type="submit">Salvar Tarefa</button>
             </form>

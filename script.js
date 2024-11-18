@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', loadTasks)
+
 const confirmDeleteButton = document.getElementById('confirmDeleteButton')
 const addTaskButton = document.getElementById('addTaskButton')
 const taskModal = document.getElementById('taskModal')
@@ -11,6 +12,7 @@ const API_URL = 'https://to-do-list-ppj7.onrender.com'
 let tasks = []
 let nextOrder = 1
 let taskToEditIndex = null
+let taskToDeleteIndex = null
 
 async function loadTasks() {
     try {
@@ -26,18 +28,13 @@ async function loadTasks() {
     }
 }
 
-function dateLock() {
-    const today = new Date().toISOString().split('T')[0]
-    document.getElementById('taskDeadline').setAttribute('min', today)
-}
-
 addTaskButton.addEventListener('click', () => {
     taskModal.style.display = 'block'
     taskForm.reset()
     taskToEditIndex = null
     errorMessageDiv.style.display = 'none'
     modalTitle.textContent = 'Adicionar Nova Tarefa'
-    dateLock()
+    document.getElementById('taskName').focus()
 })
 
 closeModal.addEventListener('click', () => {
@@ -52,31 +49,39 @@ window.addEventListener('click', (event) => {
 
 async function createTask(task) {
     try {
+        const { id, order, ...taskWithoutOrder } = task
+
+        console.log('Enviando tarefa para criação:', taskWithoutOrder)
+
         const response = await fetch(`${API_URL}/tasks`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(task)
+            body: JSON.stringify(taskWithoutOrder)
         })
 
-        if (!response.ok) throw new Error('Erro ao criar tarefa')
-        return await response.json()
+        const responseText = await response.text()
+        console.log('Resposta da API (texto):', responseText)
 
+        if (!response.ok) {
+            throw new Error(`Erro ao criar tarefa: ${response.status} - ${responseText}`)
+        }
+
+        return responseText ? JSON.parse(responseText) : null
     } catch (error) {
-        console.error('Erro ao criar tarefa:', error)
+        console.error('Erro ao criar tarefa:', error.message)
         return null
     }
 }
 
-function updateTaskList(itens) {
+async function updateTaskList(itens) {
     const tbody = document.getElementById('taskList')
     tbody.innerHTML = ''
     itens.sort((a, b) => a.order - b.order)
 
     itens.forEach((item, index) => {
         const tr = document.createElement('tr')
-        tr.setAttribute('draggable', true)
         tr.dataset.index = index
 
         const data = new Date(item.deadline)
@@ -84,7 +89,7 @@ function updateTaskList(itens) {
 
         const formattedCost = new Intl.NumberFormat('pt-BR', {
             style: 'currency',
-            currency: 'BRL'
+            currency: 'BRL',
         }).format(item.cost)
 
         if (item.cost >= 1000) {
@@ -97,94 +102,104 @@ function updateTaskList(itens) {
             <td>${formattedCost}</td>
             <td>${formattedDate}</td>
             <td class="actions">
-                <button onclick="editTask(${index})" class="editButton">
+                <button class="editButton">
                     <img src="assets/edit.svg" alt="">
                 </button>
-                <button onclick="openDeleteModal(${index})" class="deleteButton">
+                <button class="deleteButton">
                     <img src="assets/delete.svg" alt="">
                 </button>
             </td>
             <td>
-                <button onclick="moveTaskUp(${index})" class="upButton" ${index === 0 ? 'disabled' : ''}>
+                <button class="upButton" ${index === 0 ? 'disabled' : ''}>
                     <span class="arrow up"></span>
                 </button>
-                <button onclick="moveTaskDown(${index})" class="downButton" ${index === itens.length - 1 ? 'disabled' : ''}>
+                <button class="downButton" ${index === itens.length - 1 ? 'disabled' : ''}>
                     <span class="arrow down"></span>
                 </button>
             </td>
         `
 
-        tr.addEventListener('dragstart', (e) => {
-            draggedItem = tr
-            setTimeout(() => {
-                tr.style.display = 'none'
-            }, 0)
-        })
-
-        tr.addEventListener('dragend', () => {
-            draggedItem = null
-            tr.style.display = 'table-row'
-        })
-
-        tr.addEventListener('dragover', (e) => {
-            e.preventDefault()
-        })
-
-        tr.addEventListener('drop', (e) => {
-            e.preventDefault()
-            if (draggedItem && draggedItem !== tr) {
-                const draggedIndex = parseInt(draggedItem.dataset.index)
-                const targetIndex = index
-                const draggedTask = tasks[draggedIndex]
-                tasks.splice(draggedIndex, 1)
-                tasks.splice(targetIndex, 0, draggedTask)
-                tasks.forEach((task, i) => task.order = i + 1)
-                updateTaskList(tasks)
-            }
-        })
+        const editButton = tr.querySelector('.editButton')
+        const deleteButton = tr.querySelector('.deleteButton')
+        const upButton = tr.querySelector('.upButton')
+        const downButton = tr.querySelector('.downButton')
+        editButton.addEventListener('click', () => editTask(index))
+        deleteButton.addEventListener('click', () => openDeleteModal(index))
+        upButton.addEventListener('click', () => moveTaskUp(index))
+        downButton.addEventListener('click', () => moveTaskDown(index))
 
         tbody.appendChild(tr)
     })
 }
 
-function moveTaskUp(index) {
+async function moveTaskUp(index) {
     if (index > 0) {
-        const temp = tasks[index - 1]
-        tasks[index - 1] = tasks[index]
-        tasks[index] = temp
-        tasks[index].order = index + 1
-        tasks[index - 1].order = index
-        updateTaskList(tasks)
+        const currentTask = tasks[index]
+
+        try {
+            const url = `${API_URL}/tasks/${currentTask.id}/move?direction=up`
+            const response = await fetch(url, {
+                method: 'PUT',
+            })
+
+            if (!response.ok) {
+                const responseText = await response.text()
+                throw new Error(`Erro ao mover tarefa para cima: ${response.status} - ${responseText}`)
+            }
+
+            loadTasks()
+        } catch (error) {
+            console.error('Erro ao mover tarefa para cima:', error.message)
+        }
     }
 }
 
-function moveTaskDown(index) {
+async function moveTaskDown(index) {
     if (index < tasks.length - 1) {
-        const temp = tasks[index + 1]
-        tasks[index + 1] = tasks[index]
-        tasks[index] = temp
-        tasks[index].order = index + 1
-        tasks[index + 1].order = index + 2
-        updateTaskList(tasks)
+        const currentTask = tasks[index]
+
+        try {
+            const url = `${API_URL}/tasks/${currentTask.id}/move?direction=down`
+            const response = await fetch(url, {
+                method: 'PUT',
+            })
+
+            if (!response.ok) {
+                const responseText = await response.text()
+                throw new Error(`Erro ao mover tarefa para baixo: ${response.status} - ${responseText}`)
+            }
+
+            loadTasks()
+        } catch (error) {
+            console.error('Erro ao mover tarefa para baixo:', error)
+        }
     }
 }
 
 async function updateTask(task) {
     try {
-        const response = await fetch(`${API_URL}/tasks/${task.id}`, {
+        const { id, ...taskWithoutOrder } = task
+        const response = await fetch(`${API_URL}/tasks/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                ...task,
-                deadline: new Date(task.deadline.split('/').reverse().join('-')).toISOString()
-            })
+            body: JSON.stringify(taskWithoutOrder)
         })
-        if (!response.ok) throw new Error('Erro ao atualizar tarefa')
-        return await response.json()
+
+        if (response.status === 204) {
+            console.log('Tarefa atualizada com sucesso (sem resposta JSON)')
+            return null
+        }
+
+        const responseText = await response.text()
+        console.log('Resposta da API (texto bruto):', responseText)
+
+        if (!response.ok) throw new Error(`Erro ao atualizar tarefa: ${response.status}`)
+        return responseText ? JSON.parse(responseText) : null
     } catch (error) {
-        console.error('Erro ao atualizar tarefa:', error)
+        console.error('Erro ao atualizar tarefa:', error.message)
+        return null
     }
 }
 
@@ -201,38 +216,41 @@ taskForm.addEventListener('submit', async (e) => {
         errorMessageDiv.textContent = 'Já existe uma tarefa com esse nome. Por favor, escolha outro!'
         errorMessageDiv.style.display = 'block'
         return
-    }
+    } 
+
     errorMessageDiv.style.display = 'none'
 
-    if (taskToEditIndex !== null) {
-        const updatedTask = {
-            id: tasks[taskToEditIndex].id,
-            name: taskName,
-            cost: taskCost,
-            deadline: taskDeadline,
-            order: tasks[taskToEditIndex].order
-        }
-        await updateTask(updatedTask)
-        tasks[taskToEditIndex] = updatedTask
-    } else {
-        const newTask = {
-            name: taskName,
-            cost: taskCost,
-            deadline: taskDeadline,
-            order: nextOrder++
+    const taskData = {
+        name: taskName,
+        cost: taskCost,
+        deadline: taskDeadline
+    }
+
+    try {
+        let responseData
+        if (taskToEditIndex !== null) {
+            const updatedTask = {
+                id: tasks[taskToEditIndex].id,
+                ...taskData
+            }
+            responseData = await updateTask(updatedTask)
+            tasks[taskToEditIndex] = updatedTask
+        } else {
+            responseData = await createTask(taskData)
+            if (responseData && responseData.id) {
+                tasks.push(responseData)
+            }
         }
 
-        const createdTask = await createTask(newTask)
-        
-        if (createdTask && createdTask.id) {
-            tasks.push(createdTask)
-        }
+        updateTaskList(tasks)
+        taskForm.reset()
+        taskModal.style.display = 'none'
+        window.location.reload()
+    } catch (error) {
+        console.error('Erro ao enviar a tarefa:', error)
+        errorMessageDiv.textContent = 'Erro ao enviar a tarefa. Por favor, tente novamente.'
+        errorMessageDiv.style.display = 'block'
     }
-    
-    updateTaskList(tasks)
-    taskForm.reset()
-    taskModal.style.display = 'none'
-    window.location.reload()
 })
 
 function editTask(index) {
@@ -250,7 +268,7 @@ function editTask(index) {
     taskModal.style.display = 'block'
     errorMessageDiv.style.display = 'none'
     modalTitle.textContent = 'Editar Tarefa'
-    dateLock()
+    document.getElementById('taskName').focus()
 }
 
 async function deleteTask(taskId) {
